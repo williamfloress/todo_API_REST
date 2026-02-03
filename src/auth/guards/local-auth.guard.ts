@@ -1,6 +1,6 @@
 /**
- * LocalAuthGuard: protege la ruta de login usando la estrategia 'local' de Passport.
- * Valida email y password en el body antes de ejecutar el controlador.
+ * Guard que usa la estrategia Passport "local" (email + password).
+ * Se aplica a POST /auth/login: valida body y pone el usuario en req.user para generar el JWT.
  */
 
 import { Injectable } from '@nestjs/common';

@@ -7,6 +7,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  /** Compara email/password con la BD; bcrypt.compare verifica el password contra el hash. Devuelve usuario sin password o null. */
+  /** Compara email/password con la BD; bcrypt.compare verifica contra el hash sin desencriptar. Devuelve usuario sin password o null. */
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user?.password && (await bcrypt.compare(password, user.password))) {
@@ -37,5 +38,11 @@ export class AuthService {
         fullName: user.full_name,
       },
     };
+  }
+
+  /** Registro público: crea usuario vía UsersService y devuelve token inmediato para iniciar sesión. */
+  async register(createUserDto: CreateUserDto) {
+    const user = await this.usersService.create(createUserDto);
+    return this.login(user);
   }
 }

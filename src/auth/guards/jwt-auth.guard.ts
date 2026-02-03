@@ -1,6 +1,6 @@
 /**
- * JwtAuthGuard: protege rutas que requieren autenticación.
- * Verifica el token JWT en el header Authorization (Bearer) usando la estrategia 'jwt'.
+ * Guard que usa la estrategia Passport "jwt" (Bearer token).
+ * Protege rutas que requieren autenticación; si el token es válido, req.user tendrá userId y email.
  */
 
 import { Injectable } from '@nestjs/common';

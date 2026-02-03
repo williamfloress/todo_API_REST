@@ -7,6 +7,7 @@
  */
 
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,7 +16,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService,
+  ) {}
 
   /** Crea un usuario: valida email único, hashea password e inserta en BD. Retorna usuario sin password. */
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
@@ -24,7 +28,8 @@ export class UsersService {
       throw new ConflictException('El email ya está registrado');
     }
 
-    const salt = await bcrypt.genSalt(10);
+    const rounds = parseInt(this.configService.get<string>('BCRYPT_ROUNDS') ?? '10', 10);
+    const salt = await bcrypt.genSalt(rounds);
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
     const query = `
@@ -102,7 +107,8 @@ export class UsersService {
     }
 
     if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt(10);
+      const rounds = parseInt(this.configService.get<string>('BCRYPT_ROUNDS') ?? '10', 10);
+      const salt = await bcrypt.genSalt(rounds);
       const hashedPassword = await bcrypt.hash(updateUserDto.password, salt);
       updates.push(`password = $${paramIndex++}`);
       values.push(hashedPassword);

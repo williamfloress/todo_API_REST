@@ -4,19 +4,30 @@
  * POST /auth/logout: mensaje simbólico (JWT stateless; el cliente debe eliminar el token).
  */
 
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /** Registro público: crea usuario y devuelve token + datos para que quede logueado. */
+  @Post('register')
+  @ApiOperation({ summary: 'Registrar nuevo usuario' })
+  @ApiResponse({ status: 201, description: 'Usuario creado y logueado' })
+  @ApiResponse({ status: 409, description: 'El email ya está registrado' })
+  async register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
+  }
+
   /** Login: LocalAuthGuard valida email/password; si son correctos devuelve access_token y datos del usuario. */
   @UseGuards(LocalAuthGuard)
+  @HttpCode(HttpStatus.OK) // POST por defecto devuelve 201 en NestJS; login no crea recurso, debe ser 200 OK
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
