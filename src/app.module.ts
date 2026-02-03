@@ -22,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -34,6 +35,8 @@ import { DatabaseModule } from './database/database.module';
     // DatabaseModule: Gestiona el pool de conexiones a PostgreSQL
     // Marcado como @Global() para estar disponible en toda la app
     DatabaseModule,
+    
+    UsersModule,
   ],
   
   // Controladores de este módulo
