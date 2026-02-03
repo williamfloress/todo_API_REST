@@ -1,3 +1,7 @@
+/**
+ * Interfaces del usuario: User (entidad), CreateUserInput y UpdateUserInput para alta/actualización.
+ */
+
 export interface User {
     user_id: string; //UUID
     full_name: string;

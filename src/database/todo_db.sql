@@ -1,3 +1,6 @@
+-- DDL del proyecto. Define tablas: users, categories, tasks, task_category, commentaries. IDs con UUID.
+-- Ejecutar en la BD (ej. todo_udo) para crear el esquema e índices.
+
 -- Tabla USERS
 CREATE TABLE users (
     user_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

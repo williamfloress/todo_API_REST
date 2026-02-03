@@ -1,3 +1,7 @@
+/**
+ * DTO para crear usuario: full_name (min 3), email válido, password (min 6). Validación + Swagger.
+ */
+
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import {ApiProperty } from '@nestjs/swagger';
 
