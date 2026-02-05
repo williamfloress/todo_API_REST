@@ -15,6 +15,10 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+/**
+ * ParseUUIDPipe valida que los parámetros de ruta (:id, :taskId) tengan formato UUID.
+ * Si no es válido, responde 400 en lugar de dejar que la BD lance error (500).
+ */
 @ApiTags('Categories')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
