@@ -27,7 +27,7 @@ export class AuthController {
 
   /** Login: LocalAuthGuard valida email/password; si son correctos devuelve access_token y datos del usuario. */
   @UseGuards(LocalAuthGuard)
-  @HttpCode(HttpStatus.OK) // POST por defecto devuelve 201 en NestJS; login no crea recurso, debe ser 200 OK
+  @HttpCode(HttpStatus.OK) // PARA QUE DEVUELVA 200 OK EN VEZ DE 201 CREATED
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
@@ -37,6 +37,7 @@ export class AuthController {
   }
 
   /** Logout: respuesta informativa; con JWT stateless el cliente debe borrar el token. */
+  @HttpCode(HttpStatus.OK) // PARA QUE DEVUELVA 200 OK EN VEZ DE 201 CREATED
   @Post('logout')
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({ status: 200, description: 'Logout exitoso' })
