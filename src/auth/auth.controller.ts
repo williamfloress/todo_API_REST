@@ -20,6 +20,7 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Registrar nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado y logueado' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 409, description: 'El email ya está registrado' })
   async register(@Body() createUserDto: CreateUserDto) {
     return this.authService.register(createUserDto);
@@ -31,6 +32,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   async login(@Request() req, @Body() loginDto: LoginDto) {
     return this.authService.login(req.user);

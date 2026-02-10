@@ -8,18 +8,18 @@ import { IsOptional, MinLength, IsEmail} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    @ApiPropertyOptional()
-    @IsOptional()
-    @MinLength(3)
-    full_name?: string;
+  @ApiPropertyOptional({ example: 'Juan Perez', description: 'Nombre completo (opcional)' })
+  @IsOptional()
+  @MinLength(3)
+  full_name?: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsEmail()
-    email?: string;
+  @ApiPropertyOptional({ example: 'juan@ejemplo.com', description: 'Email (opcional)' })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
 
-    @ApiPropertyOptional()
-    @IsOptional()
-    @MinLength(6)
-    password?: string;
+  @ApiPropertyOptional({ example: 'NewP@ss123', description: 'Nueva contraseña (opcional)' })
+  @IsOptional()
+  @MinLength(6)
+  password?: string;
 }

@@ -13,7 +13,7 @@ export class CreateCategoryDto {
     description?: string;
 
 
-    @ApiProperty ({example: '#FF5733', description: 'Color en formato hexadecimal'})
+    @ApiProperty({ example: '#FF5733', description: 'Color en formato hexadecimal (#RRGGBB)' })
     @IsNotEmpty({ message: 'El color es requerido'})
     @IsString()
     @Matches(/^#[0-9A-Fa-f]{6}$/, { message: 'El color debe estar en formato hexadecimal (#RRGGBB)'})

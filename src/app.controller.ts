@@ -3,9 +3,11 @@
  */
 
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { DatabaseService } from './database/database.service';
 
+@ApiTags('App')
 @Controller()
 export class AppController {
   constructor(
@@ -14,11 +16,15 @@ export class AppController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Health check' })
+  @ApiResponse({ status: 200, description: 'Hello World' })
   getHello(): string {
     return this.appService.getHello();
   }
 
   @Get('test-db')
+  @ApiOperation({ summary: 'Probar conexión a PostgreSQL' })
+  @ApiResponse({ status: 200, description: 'Conexión exitosa o error' })
   async testDatabase() {
     try {
       const result = await this.databaseService.query(

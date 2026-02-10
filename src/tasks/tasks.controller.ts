@@ -3,7 +3,7 @@
  * Todas las rutas requieren JWT; created_by se toma del token en POST.
  */
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -11,7 +11,7 @@ import { GetTasksDto } from './dto/get-tasks.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Tasks')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TasksController {
@@ -19,6 +19,10 @@ export class TasksController {
 
   @Post()
   @ApiOperation({ summary: 'Crear tarea' })
+  @ApiResponse({ status: 201, description: 'Tarea creada' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Usuario o categoría no encontrado' })
   create(@Body() createTaskDto: CreateTaskDto, @Request() req) {
     const userId = req.user.userId;
     return this.tasksService.create(createTaskDto, userId);
@@ -26,24 +30,36 @@ export class TasksController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las tareas con filtros' })
+  @ApiResponse({ status: 200, description: 'Lista de tareas' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
   findAll(@Query() filters: GetTasksDto) {
     return this.tasksService.findAll(filters);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener tarea por ID' })
+  @ApiResponse({ status: 200, description: 'Tarea con comentarios y categorías' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Tarea no encontrada' })
   findOne(@Param('id') id: string) {
     return this.tasksService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar tarea' })
+  @ApiResponse({ status: 200, description: 'Tarea actualizada' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Tarea no encontrada' })
   update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.tasksService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar tarea' })
+  @ApiResponse({ status: 200, description: 'Tarea eliminada' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Tarea no encontrada' })
   async remove(@Param('id') id: string) {
     await this.tasksService.remove(id);
     return { message: 'Tarea eliminada exitosamente' };
@@ -51,6 +67,9 @@ export class TasksController {
 
   @Post(':taskId/categories/:categoryId')
   @ApiOperation({ summary: 'Asociar categoría a tarea' })
+  @ApiResponse({ status: 201, description: 'Categoría asociada a la tarea' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Tarea o categoría no encontrada' })
   addCategory(@Param('taskId') taskId: string, @Param('categoryId') categoryId: string) {
     return this.tasksService.addCategory(taskId, categoryId);
   }
