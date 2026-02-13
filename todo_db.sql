@@ -38,7 +38,9 @@ CREATE TABLE tasks (
 
 -- Tabla de Relacion N:N entre task y categories
 CREATE TABLE task_category (
+    -- ON DELETE CASCADE: si se borra una TAREA, se borran todas las filas de task_category que la referencian (la tarea deja de tener categorías asociadas)
     task_id uuid NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    -- ON DELETE CASCADE: si se borra una CATEGORÍA, se borran todas las filas de task_category que la referencian (las tareas dejan de tener esa categoría)
     category_id uuid NOT NULL REFERENCES categories(category_id) ON DELETE CASCADE,
     PRIMARY KEY (task_id, category_id)
 );
@@ -47,7 +49,8 @@ CREATE TABLE task_category (
 CREATE TABLE commentaries (
     comment_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
-    task_id uuid NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
+    -- ON DELETE CASCADE: si se borra una TAREA, se borran todos sus comentarios.
+    task_id uuid NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
     comment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     comment_content TEXT NOT NULL
 );
