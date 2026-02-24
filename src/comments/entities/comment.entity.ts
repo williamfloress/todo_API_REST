@@ -1,4 +1,4 @@
-// Entidad e interfaces del comentario (tabla commentaries). Mapea comment_id, user_id, task_id, comment_date, comment_content y tipos para crear/listar con relaciones.
+// Tipos de la tabla commentaries; CommentWithRelations incluye creator_name y task_name (JOINs).
 
 export interface Comment {
   comment_id: string;

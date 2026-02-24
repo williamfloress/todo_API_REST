@@ -1,8 +1,4 @@
-/**
- * AuthController: endpoints de autenticación.
- * POST /auth/login: valida credenciales con LocalAuthGuard y devuelve JWT + usuario.
- * POST /auth/logout: mensaje simbólico (JWT stateless; el cliente debe eliminar el token).
- */
+// Rutas de autenticación: login (JWT + usuario), registro y logout (solo aviso; el cliente borra el token).
 
 import { Controller, Post, UseGuards, Request, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -16,7 +12,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  /** Registro público: crea usuario y devuelve token + datos para que quede logueado. */
+  // Registro: creamos el usuario y le devolvemos token y datos para dejarlo logueado de una.
   @Post('register')
   @ApiOperation({ summary: 'Registrar nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado y logueado' })
@@ -26,9 +22,9 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  /** Login: LocalAuthGuard valida email/password; si son correctos devuelve access_token y datos del usuario. */
+  // Login: el Guard valida email/password; si todo bien, devolvemos access_token y datos del usuario.
   @UseGuards(LocalAuthGuard)
-  @HttpCode(HttpStatus.OK) // PARA QUE DEVUELVA 200 OK EN VEZ DE 201 CREATED
+  @HttpCode(HttpStatus.OK) // así respondemos 200 en vez de 201
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
@@ -38,8 +34,8 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  /** Logout: respuesta informativa; con JWT stateless el cliente debe borrar el token. */
-  @HttpCode(HttpStatus.OK) // PARA QUE DEVUELVA 200 OK EN VEZ DE 201 CREATED
+  // Logout: solo avisamos; como el JWT es stateless, el cliente tiene que borrar el token.
+  @HttpCode(HttpStatus.OK)
   @Post('logout')
   @ApiOperation({ summary: 'Cerrar sesión' })
   @ApiResponse({ status: 200, description: 'Logout exitoso' })

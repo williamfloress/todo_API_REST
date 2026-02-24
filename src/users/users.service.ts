@@ -1,11 +1,4 @@
-/**
- * UsersService: CRUD de usuarios con SQL nativo (PostgreSQL).
- * - Crea usuarios con email único y password hasheado (bcrypt).
- * - Lista, busca por ID, busca por email (para login).
- * - Actualiza y elimina usuarios.
- * Nunca expone el campo password en las respuestas.
- */
-
+// CRUD de usuarios con SQL; email único, password con bcrypt. Nunca devolvemos password; findByEmail sí lo trae para login.
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../database/database.service';
@@ -46,7 +39,7 @@ export class UsersService {
     return result.rows[0];
   }
 
-  /** Lista todos los usuarios ordenados por fecha de creación (más recientes primero). Sin password. */
+  // Todos, ordenados por created_at DESC; sin password.
   async findAll(): Promise<Omit<User, 'password'>[]> {
     const query = `
       SELECT user_id, full_name, email, created_at, updated_at
@@ -57,7 +50,7 @@ export class UsersService {
     return result.rows;
   }
 
-  /** Busca un usuario por ID. Lanza NotFoundException si no existe. Retorna sin password. */
+  // Por ID; 404 si no está. Sin password.
   async findOne(id: string): Promise<Omit<User, 'password'>> {
     const query = `
       SELECT user_id, full_name, email, created_at, updated_at
@@ -73,7 +66,7 @@ export class UsersService {
     return result.rows[0];
   }
 
-  /** Busca usuario por email (incluye password). Usado para login/validación. Retorna null si no existe. */
+  // Por email; incluye password (para Auth). Null si no existe.
   async findByEmail(email: string): Promise<User | null> {
     const query = `
       SELECT user_id, full_name, email, password, created_at, updated_at
@@ -84,7 +77,7 @@ export class UsersService {
     return result.rows[0] || null;
   }
 
-  /** Actualiza usuario por ID. Valida email único si se cambia; hashea password si se envía. Retorna sin password. */
+  // Actualización parcial; email único, password hasheado si viene. Devolvemos sin password.
   async update(id: string, updateUserDto: UpdateUserDto): Promise<Omit<User, 'password'>> {
     await this.findOne(id);
 
@@ -132,7 +125,7 @@ export class UsersService {
     return result.rows[0];
   }
 
-  /** Elimina un usuario por ID. Verifica que exista antes de borrar. */
+  // Borramos; 404 si no existe.
   async remove(id: string): Promise<void> {
     await this.findOne(id);
 

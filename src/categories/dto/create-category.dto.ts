@@ -1,3 +1,4 @@
+// Body para crear categoría: nombre, descripción opcional y color en hex (#RRGGBB).
 import { IsNotEmpty, IsString, IsOptional, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -11,7 +12,6 @@ export class CreateCategoryDto {
     @IsOptional()
     @IsString()
     description?: string;
-
 
     @ApiProperty({ example: '#FF5733', description: 'Color en formato hexadecimal (#RRGGBB)' })
     @IsNotEmpty({ message: 'El color es requerido'})

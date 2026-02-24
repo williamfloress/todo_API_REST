@@ -1,4 +1,4 @@
-// Controlador de comentarios: endpoints CRUD bajo /comments, protegidos con JWT. Listar por tarea, crear en tarea, obtener uno, actualizar y eliminar (userId del token para permisos).
+// CRUD de comentarios; todo con JWT. Editar/borrar solo el autor (userId del token).
 
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  // Comentarios de una tarea (ruta fija antes de :id).
   @Get('tasks/:taskId')
   @ApiOperation({ summary: 'Obtener comentarios de una tarea' })
   @ApiResponse({ status: 200, description: 'Lista de comentarios de la tarea' })
@@ -23,6 +24,7 @@ export class CommentsController {
     return this.commentsService.findAll(taskId);
   }
 
+  // Un comentario por ID (con creator_name y task_name).
   @Get(':id')
   @ApiOperation({ summary: 'Obtener comentario por ID' })
   @ApiResponse({ status: 200, description: 'Comentario encontrado' })
@@ -32,6 +34,7 @@ export class CommentsController {
     return this.commentsService.findOne(id);
   }
 
+  // Crear comentario en la tarea (taskId en URL; el usuario viene del JWT).
   @Post('tasks/:taskId')
   @ApiOperation({ summary: 'Crear comentario en una tarea' })
   @ApiResponse({ status: 201, description: 'Comentario creado' })
@@ -43,6 +46,7 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto, userId, taskId);
   }
 
+  // Actualizar contenido; 403 si no eres el autor.
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar comentario' })
   @ApiResponse({ status: 200, description: 'Comentario actualizado' })
@@ -55,6 +59,7 @@ export class CommentsController {
     return this.commentsService.update(id, updateCommentDto, userId);
   }
 
+  // Borrar; 403 si no eres el autor.
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar comentario' })
   @ApiResponse({ status: 200, description: 'Comentario eliminado' })

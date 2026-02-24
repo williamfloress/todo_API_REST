@@ -1,7 +1,4 @@
-/**
- * DTO para actualizar usuario. Todos los campos opcionales; mismas reglas que CreateUserDto si se envían.
- */
-
+// Actualización parcial; mismas reglas que CreateUserDto si envías el campo.
 import { PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 import { IsOptional, MinLength, IsEmail} from 'class-validator';

@@ -1,8 +1,4 @@
-/**
- * AuthService: valida credenciales (email + password) y genera JWT.
- * validateUser: busca usuario por email y compara password con bcrypt; devuelve usuario sin password o null.
- * login: recibe el usuario ya validado por LocalStrategy y devuelve access_token + datos de usuario.
- */
+// Aquí validamos email/password y generamos el JWT. validateUser compara con bcrypt y devuelve el usuario (sin password) o null; login recibe el usuario ya validado y devuelve token + datos.
 
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,7 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  /** Compara email/password con la BD; bcrypt.compare verifica contra el hash sin desencriptar. Devuelve usuario sin password o null. */
+  // Buscamos por email y comparamos la contraseña con bcrypt; devolvemos el usuario sin el campo password o null.
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user?.password && (await bcrypt.compare(password, user.password))) {
@@ -27,7 +23,7 @@ export class AuthService {
     return null;
   }
 
-  /** Genera JWT (payload: email, sub=user_id) y devuelve access_token + datos de usuario para la respuesta. */
+  // Montamos el JWT con email y sub (user_id) y devolvemos access_token más los datos del usuario.
   async login(user: any) {
     const payload = { email: user.email, sub: user.user_id };
     return {
@@ -40,7 +36,7 @@ export class AuthService {
     };
   }
 
-  /** Registro público: crea usuario vía UsersService y devuelve token inmediato para iniciar sesión. */
+  // Creamos el usuario y le devolvemos el token al momento para que quede logueado.
   async register(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     return this.login(user);

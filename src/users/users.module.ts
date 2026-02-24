@@ -1,8 +1,4 @@
-/**
- * Módulo de usuarios. Declara UsersService y UsersController (rutas bajo /users).
- * Importa DatabaseModule para SQL nativo. Exporta UsersService para que AuthModule lo use en login.
- */
-
+// Usuarios: CRUD con DatabaseModule; exportamos UsersService para Auth (login).
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';

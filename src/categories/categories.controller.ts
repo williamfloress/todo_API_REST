@@ -15,10 +15,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-/**
- * ParseUUIDPipe valida que los parámetros de ruta (:id, :taskId) tengan formato UUID.
- * Si no es válido, responde 400 en lugar de dejar que la BD lance error (500).
- */
+// CRUD de categorías; todo requiere JWT. Los :id y :taskId se validan como UUID (400 si no).
 @ApiTags('Categories')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
@@ -26,7 +23,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  /** POST /categories — Crea una nueva categoría. */
+  // Crear categoría (nombre único).
   @Post()
   @ApiOperation({ summary: 'Crear categoría' })
   @ApiResponse({ status: 201, description: 'Categoría creada' })
@@ -36,7 +33,7 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto);
   }
 
-  /** GET /categories — Lista todas las categorías. */
+  // Listar todas, ordenadas por nombre.
   @Get()
   @ApiOperation({ summary: 'Obtener todas las categorías' })
   @ApiResponse({ status: 200, description: 'Lista de categorías' })
@@ -45,7 +42,7 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
-  /** GET /categories/not-in-task/:taskId — Categorías que no están en la tarea (ruta específica antes de :id). */
+  // Categorías que aún no tiene la tarea (ruta fija antes de :id para no chocar con findOne).
   @Get('not-in-task/:taskId')
   @ApiOperation({ summary: 'Listar categorías NO asociadas a una tarea' })
   @ApiResponse({ status: 200, description: 'Categorías no asociadas a la tarea' })
@@ -55,7 +52,7 @@ export class CategoriesController {
     return this.categoriesService.findNotInTask(taskId);
   }
 
-  /** GET /categories/:id — Obtiene una categoría por ID (UUID). */
+  // Una categoría por ID.
   @Get(':id')
   @ApiOperation({ summary: 'Obtener categoría por ID' })
   @ApiResponse({ status: 200, description: 'Categoría encontrada' })
@@ -65,7 +62,7 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
-  /** PATCH /categories/:id — Actualiza una categoría. */
+  // Actualizar (parcial); nombre sigue teniendo que ser único.
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar categoría' })
   @ApiResponse({ status: 200, description: 'Categoría actualizada' })
@@ -79,7 +76,7 @@ export class CategoriesController {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
-  /** DELETE /categories/:id — Elimina una categoría (CASCADE en task_category). */
+  // Borrar categoría; la BD hace CASCADE en task_category.
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar categoría' })
   @ApiResponse({ status: 200, description: 'Categoría eliminada' })

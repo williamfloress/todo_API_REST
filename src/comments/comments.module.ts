@@ -1,4 +1,4 @@
-// Módulo de comentarios: expone CommentsController y CommentsService, usa DatabaseModule para consultas SQL nativas.
+// Comentarios: controller y service; consultas directas con DatabaseModule.
 
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';

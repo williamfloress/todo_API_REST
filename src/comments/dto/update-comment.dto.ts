@@ -1,4 +1,4 @@
-// DTO para actualizar comentario: solo permite modificar comment_content.
+// Solo se puede cambiar el texto del comentario.
 
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';

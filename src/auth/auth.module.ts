@@ -1,8 +1,4 @@
-/**
- * Módulo de autenticación: JWT + Passport (Local y JWT).
- * Importa UsersModule para validar usuario/contraseña; configura JWT con secret y expiración desde .env.
- * Registra LocalStrategy (login con email/password) y JwtStrategy (proteger rutas con Bearer token).
- */
+// Autenticación con JWT y Passport (local + jwt). Usamos UsersModule para validar; el JWT se configura con secret y expiración desde .env. LocalStrategy para login con email/password, JwtStrategy para rutas protegidas con Bearer.
 
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';

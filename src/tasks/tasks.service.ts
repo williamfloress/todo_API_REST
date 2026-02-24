@@ -1,7 +1,4 @@
-/**
- * Lógica de negocio de tareas: crear, listar (filtros/paginación), obtener una (con comentarios y categorías),
- * actualizar, eliminar y asociar categorías. Usa SQL nativo vía DatabaseService.
- */
+// CRUD de tareas con SQL nativo: filtros/paginación, comentarios y categorías en findOne, y asociar categoría.
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { CreateTaskDto, TaskStatus } from './dto/create-task.dto';
@@ -13,8 +10,8 @@ import { Task, TaskWithRelations } from './entities/task.entity';
 export class TasksService {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  // Insertamos tarea y enlaces task_category; validamos categorías y assigned_to. 404 si no existen.
   async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
-    // Validar que cada category_id existe (MER v2: N:M)
     for (const cid of createTaskDto.category_ids) {
       const r = await this.databaseService.query(
         `SELECT category_id FROM categories WHERE category_id = $1`,
@@ -25,7 +22,6 @@ export class TasksService {
       }
     }
 
-    // Validar que el usuario asignado existe (obligatorio)
     const ur = await this.databaseService.query(
       `SELECT user_id FROM users WHERE user_id = $1`,
       [createTaskDto.assigned_to],
@@ -64,6 +60,7 @@ export class TasksService {
     return task;
   }
 
+  // Lista con creator_name, assignee_name, category_ids/names; filtros opcionales y limit/offset.
   async findAll(filters: GetTasksDto): Promise<TaskWithRelations[]> {
     let query = `
       SELECT
@@ -102,8 +99,8 @@ export class TasksService {
     return result.rows;
   }
 
+  // Una tarea con creator/assignee, comentarios (con autor) y categorías completas. 404 si no está.
   async findOne(id: string): Promise<TaskWithRelations> {
-    // Obtener información básica de la tarea
     const taskQuery = `
       SELECT
         t.*,
@@ -122,7 +119,6 @@ export class TasksService {
     
     const task = taskResult.rows[0];
 
-    // Obtener comentarios de la tarea
     const commentsQuery = `
       SELECT 
         c.comment_id,
@@ -138,7 +134,6 @@ export class TasksService {
     const commentsResult = await this.databaseService.query(commentsQuery, [id]);
     task.comments = commentsResult.rows;
 
-    // Obtener categorías completas de la tarea
     const categoriesQuery = `
       SELECT 
         c.category_id,
@@ -156,6 +151,7 @@ export class TasksService {
     return task;
   }
 
+  // Actualización parcial; si mandas category_ids reemplazamos todos los enlaces. Validamos categorías y assigned_to.
   async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
     await this.findOne(id);
 
@@ -214,16 +210,16 @@ export class TasksService {
     return find.rows[0];
   }
 
+  // Borramos; 404 si no existe. La BD hace CASCADE.
   async remove(id: string): Promise<void> {
     await this.findOne(id);
     await this.databaseService.query(`DELETE FROM tasks WHERE task_id = $1`, [id]);
   }
 
+  // Añade la categoría a la tarea; 404 si tarea/categoría no existen, 400 si ya estaba asociada.
   async addCategory(taskId: string, categoryId: string): Promise<{ message: string }> {
-    // Verificar que la tarea existe
     await this.findOne(taskId);
 
-    // Verificar que la categoría existe
     const catQuery = `SELECT category_id FROM categories WHERE category_id = $1`;
     const catResult = await this.databaseService.query(catQuery, [categoryId]);
     
@@ -231,7 +227,6 @@ export class TasksService {
       throw new NotFoundException(`Categoría con ID ${categoryId} no encontrada`);
     }
 
-    // Verificar si la relación ya existe
     const existsQuery = `
       SELECT * FROM task_category 
       WHERE task_id = $1 AND category_id = $2
@@ -242,7 +237,6 @@ export class TasksService {
       throw new BadRequestException('La categoría ya está asociada a esta tarea');
     }
 
-    // Insertar la relación
     const insertQuery = `
       INSERT INTO task_category (task_id, category_id)
       VALUES ($1, $2)

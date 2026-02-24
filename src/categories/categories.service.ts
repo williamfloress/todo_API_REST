@@ -1,3 +1,4 @@
+// Lógica de categorías contra la BD; nombre único y CASCADE al borrar.
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -8,7 +9,7 @@ import { Category } from './entities/category.entity';
 export class CategoriesService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  /** Crea una categoría. Valida nombre único. */
+  // Insertamos; si el nombre ya existe → 409.
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
     const existing = await this.findByName(createCategoryDto.name);
     if (existing) {
@@ -29,14 +30,14 @@ export class CategoriesService {
     return result.rows[0];
   }
 
-  /** Lista todas las categorías ordenadas por nombre. */
+  // Todas, ordenadas por nombre.
   async findAll(): Promise<Category[]> {
     const query = `SELECT * FROM categories ORDER BY name ASC`;
     const result = await this.databaseService.query<Category>(query);
     return result.rows;
   }
 
-  /** Busca una categoría por ID. Lanza NotFound si no existe. */
+  // Por ID; 404 si no está.
   async findOne(id: string): Promise<Category> {
     const query = `SELECT * FROM categories WHERE category_id = $1`;
     const result = await this.databaseService.query<Category>(query, [id]);
@@ -48,14 +49,14 @@ export class CategoriesService {
     return result.rows[0];
   }
 
-  /** Busca categoría por nombre. Retorna null si no existe. */
+  // Por nombre; null si no hay ninguna (para comprobar duplicados).
   async findByName(name: string): Promise<Category | null> {
     const query = `SELECT * FROM categories WHERE name = $1`;
     const result = await this.databaseService.query<Category>(query, [name]);
     return result.rows[0] || null;
   }
 
-  /** Actualiza una categoría. Valida existencia y nombre único si se cambia. */
+  // Actualización parcial; comprobamos que exista y que el nombre no lo tenga otra.
   async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
     await this.findOne(id);
 
@@ -102,7 +103,7 @@ export class CategoriesService {
     return result.rows[0];
   }
 
-  /** Elimina una categoría. CASCADE borra relaciones en task_category. */
+  // Borramos; la FK con task_category hace CASCADE solo.
   async remove(id: string): Promise<void> {
     await this.findOne(id);
 
@@ -110,7 +111,7 @@ export class CategoriesService {
     await this.databaseService.query(query, [id]);
   }
 
-  /** Devuelve categorías que no están asociadas a la tarea indicada. */
+  // Categorías que no tiene esa tarea (útil para añadir más desde el front).
   async findNotInTask(taskId: string): Promise<Category[]> {
     const taskQuery = `SELECT task_id FROM tasks WHERE task_id = $1`;
     const taskResult = await this.databaseService.query(taskQuery, [taskId]);

@@ -1,8 +1,4 @@
-/**
- * Controlador de usuarios. Todas las rutas requieren JWT (JwtAuthGuard).
- * CRUD: POST /users, GET /users, GET /users/:id, PATCH /users/:id, DELETE /users/:id.
- */
-
+// CRUD de usuarios; todo con JWT. Nunca devolvemos el password.
 import {
   Controller,
   Get,
@@ -26,6 +22,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Crear usuario; email único, password hasheado con bcrypt.
   @Post()
   @ApiOperation({ summary: 'Crear usuario' })
   @ApiResponse({ status: 201, description: 'Usuario creado' })
@@ -36,6 +33,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  // Listar todos (sin password), más recientes primero.
   @Get()
   @ApiOperation({ summary: 'Obtener todos los usuarios' })
   @ApiResponse({ status: 200, description: 'Lista de usuarios' })
@@ -44,6 +42,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  // Un usuario por ID. 404 si no existe.
   @Get(':id')
   @ApiOperation({ summary: 'Obtener usuario por ID' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
@@ -53,6 +52,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  // Actualizar (parcial); email único, password se hashea si se envía.
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar usuario' })
   @ApiResponse({ status: 200, description: 'Usuario actualizado' })
@@ -66,6 +66,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  // Borrar usuario; 404 si no existe.
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar usuario' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado' })

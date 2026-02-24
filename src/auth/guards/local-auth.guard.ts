@@ -1,7 +1,4 @@
-/**
- * Guard que usa la estrategia Passport "local" (email + password).
- * Se aplica a POST /auth/login: valida body y pone el usuario en req.user para generar el JWT.
- */
+// Guard de Passport "local": valida email y password y deja el usuario en req.user para el login.
 
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';

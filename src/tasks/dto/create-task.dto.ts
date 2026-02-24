@@ -1,6 +1,4 @@
-/**
- * DTO para crear tarea: nombre, descripción, status (4 estados), story_points, due_date, assigned_to (obligatorio), category_ids (N:M).
- */
+// Body para crear tarea: nombre, status (4 estados), assigned_to obligatorio, al menos una categoría (category_ids).
 import { IsNotEmpty, IsString, IsEnum, IsOptional, IsInt, IsDateString, Min, IsArray, ArrayMinSize, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 

@@ -1,13 +1,11 @@
-/**
- * DTO para el body del login: email y password.
- * Usado por POST /auth/login con validación (class-validator).
- */
+// Lo que esperamos en el body del login: email y contraseña (validados con class-validator)
 
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
   @ApiProperty({ example: 'juan@ejemplo.com', description: 'Email del usuario' })
+  @IsNotEmpty({ message: 'El email es requerido' })
   @IsEmail({}, { message: 'El email debe ser válido' })
   email: string;
 

@@ -1,7 +1,4 @@
-/**
- * Guard que usa la estrategia Passport "jwt" (Bearer token).
- * Protege rutas que requieren autenticación; si el token es válido, req.user tendrá userId y email.
- */
+// Guard de Passport "jwt": protege rutas con Bearer token; si es válido, req.user tendrá userId y email.
 
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';

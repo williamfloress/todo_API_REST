@@ -1,3 +1,4 @@
+// Módulo de categorías: CRUD + listado “no en tarea”; usa DatabaseModule.
 import { Module } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';

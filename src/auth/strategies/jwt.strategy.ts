@@ -1,7 +1,4 @@
-/**
- * Estrategia Passport "jwt": extrae y verifica el Bearer token en rutas protegidas.
- * El payload del token debe incluir sub (user_id) y email; validate devuelve { userId, email } para el request.
- */
+// Estrategia jwt: lee y verifica el Bearer en rutas protegidas. Del payload usamos sub y email; validate devuelve { userId, email } a req.user.
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
@@ -18,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  /** Recibe el payload del JWT (sub, email) y devuelve el objeto que se adjunta a request.user. */
+  // Del payload sacamos sub y email y lo pasamos a request.user.
   async validate(payload: any) {
     return { userId: payload.sub, email: payload.email };
   }

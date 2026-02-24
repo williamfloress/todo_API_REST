@@ -1,4 +1,4 @@
-// DTO para crear comentario: comment_content obligatorio y task_id opcional (puede venir en params).
+// Body para crear comentario: texto obligatorio; task_id puede ir aquí o en la URL (params).
 
 import { IsNotEmpty, IsString, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';

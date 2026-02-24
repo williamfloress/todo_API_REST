@@ -1,4 +1,4 @@
-// Servicio de comentarios: CRUD con SQL nativo, validación de tarea existente y permisos (solo el autor puede actualizar/eliminar). JOINs con users y tasks para creator_name y task_name.
+// CRUD contra la tabla commentaries; comprobamos que la tarea exista y que solo el autor edite/borre. Listados con JOIN a users y tasks para nombre y tarea.
 
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
@@ -10,6 +10,7 @@ import { Comment, CommentWithRelations } from './entities/comment.entity';
 export class CommentsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  // Insertamos; task_id puede venir en el body o por param. 404 si la tarea no existe.
   async create(createCommentDto: CreateCommentDto, userId: string, taskId?: string): Promise<Comment> {
     const tid = createCommentDto.task_id ?? taskId;
     if (tid == null) {
@@ -33,6 +34,7 @@ export class CommentsService {
     return result.rows[0];
   }
 
+  // Lista con creator_name y task_name; si pasas taskId, filtramos por esa tarea. Orden: más recientes primero.
   async findAll(taskId?: string): Promise<CommentWithRelations[]> {
     let query = `
       SELECT 
@@ -53,6 +55,7 @@ export class CommentsService {
     return result.rows;
   }
 
+  // Uno por ID con relaciones; 404 si no está.
   async findOne(id: string): Promise<CommentWithRelations> {
     const query = `
       SELECT 
@@ -71,6 +74,7 @@ export class CommentsService {
     return result.rows[0];
   }
 
+  // Solo actualizamos el texto; 403 si el userId no es el autor.
   async update(id: string, updateCommentDto: UpdateCommentDto, userId: string): Promise<Comment> {
     const comment = await this.findOne(id);
     if (comment.user_id !== userId) {
@@ -89,6 +93,7 @@ export class CommentsService {
     return result.rows[0];
   }
 
+  // Borramos; 403 si no eres el autor.
   async remove(id: string, userId: string): Promise<void> {
     const comment = await this.findOne(id);
     if (comment.user_id !== userId) {

@@ -1,6 +1,4 @@
-/**
- * Interfaces de tarea: Task (base), CreateTaskInput y TaskWithRelations (con creator, assignee, comments, categories).
- */
+// Tipos de la tabla tasks; TaskWithRelations incluye creator_name, assignee_name, comments y categories.
 export interface Task {
     task_id: string; //UUID
     name: string;

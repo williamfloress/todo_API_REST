@@ -1,7 +1,4 @@
-/**
- * Controlador de tareas: CRUD, listado con filtros/paginación y asociación de categorías.
- * Todas las rutas requieren JWT; created_by se toma del token en POST.
- */
+// CRUD de tareas, listado con filtros/paginación y asociar categoría. JWT en todo; created_by del token al crear.
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
@@ -17,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
+  // Crear tarea; categorías y assigned_to validados en el service.
   @Post()
   @ApiOperation({ summary: 'Crear tarea' })
   @ApiResponse({ status: 201, description: 'Tarea creada' })
@@ -28,6 +26,7 @@ export class TasksController {
     return this.tasksService.create(createTaskDto, userId);
   }
 
+  // Listar con filtros (status, category_id, assigned_to) y paginación (limit, offset).
   @Get()
   @ApiOperation({ summary: 'Obtener todas las tareas con filtros' })
   @ApiResponse({ status: 200, description: 'Lista de tareas' })
@@ -36,6 +35,7 @@ export class TasksController {
     return this.tasksService.findAll(filters);
   }
 
+  // Una tarea con comentarios y categorías.
   @Get(':id')
   @ApiOperation({ summary: 'Obtener tarea por ID' })
   @ApiResponse({ status: 200, description: 'Tarea con comentarios y categorías' })
@@ -45,6 +45,7 @@ export class TasksController {
     return this.tasksService.findOne(id);
   }
 
+  // Actualizar (parcial); category_ids reemplaza la lista entera.
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar tarea' })
   @ApiResponse({ status: 200, description: 'Tarea actualizada' })
@@ -55,6 +56,7 @@ export class TasksController {
     return this.tasksService.update(id, updateTaskDto);
   }
 
+  // Borrar tarea (CASCADE en comentarios y task_category).
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar tarea' })
   @ApiResponse({ status: 200, description: 'Tarea eliminada' })
@@ -65,6 +67,7 @@ export class TasksController {
     return { message: 'Tarea eliminada exitosamente' };
   }
 
+  // Añadir una categoría a la tarea (evita duplicados).
   @Post(':taskId/categories/:categoryId')
   @ApiOperation({ summary: 'Asociar categoría a tarea' })
   @ApiResponse({ status: 201, description: 'Categoría asociada a la tarea' })

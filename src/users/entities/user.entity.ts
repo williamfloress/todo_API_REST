@@ -1,7 +1,4 @@
-/**
- * Interfaces del usuario: User (entidad), CreateUserInput y UpdateUserInput para alta/actualización.
- */
-
+// Tipos de la tabla users; password opcional para no exponerlo en respuestas.
 export interface User {
     user_id: string; //UUID
     full_name: string;

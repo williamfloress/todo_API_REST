@@ -1,6 +1,4 @@
-/**
- * DTO de query para GET /tasks: filtros opcionales (status, category_id, assigned_to) y paginación (limit, offset).
- */
+// Query de GET /tasks: filtros (status, category_id, assigned_to) y paginación (limit, offset).
 import { IsOptional, IsEnum, IsInt, Min, IsUUID } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TaskStatus } from './create-task.dto';

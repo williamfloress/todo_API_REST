@@ -1,7 +1,4 @@
-/**
- * DTO para login: email y password. Se usa en POST /auth/login para validar el body.
- */
-
+// Body de login: email y password (usado en POST /auth/login).
 import { IsEmail, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 

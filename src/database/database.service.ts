@@ -1,8 +1,13 @@
 /**
- * Servicio de BD. Usa un pool de PostgreSQL (config desde .env). Expone query(), getClient() y transaction() para SQL nativo.
- * Al arrancar comprueba la conexión; al cerrar la app cierra el pool.
+ * Servicio de base de datos: pool de conexiones PostgreSQL (lib pg).
+ *
+ * Configuración desde .env: DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE.
+ * - query(sql, params): ejecuta una sentencia con parámetros ($1, $2…) — uso habitual, evita inyección.
+ * - getClient(): reserva una conexión del pool; hay que llamar client.release() al terminar.
+ * - transaction(callback): ejecuta el callback dentro de BEGIN/COMMIT; si hay error hace ROLLBACK y libera el cliente.
+ *
+ * Ciclo de vida: al arrancar (onModuleInit) se prueba la conexión; si falla, Nest no arranca. Al cerrar (onModuleDestroy) se cierra el pool.
  */
-
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
@@ -19,16 +24,17 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       user: this.configService.get<string>('DB_USERNAME'),
       password: this.configService.get<string>('DB_PASSWORD'),
       database: this.configService.get<string>('DB_DATABASE'),
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      max: 20, // máximo de conexiones simultáneas en el pool
+      idleTimeoutMillis: 30000, // cierra conexiones inactivas tras 30s
+      connectionTimeoutMillis: 2000, // tiempo máximo para conectar (2s)
     });
+    // Errores en conexiones idle (p. ej. BD reiniciada) se loguean; el pool puede crear nuevas conexiones.
     this.pool.on('error', (err) => {
       this.logger.error('Unexpected error on idle client', err);
     });
   }
 
-  /** Al arrancar el módulo: prueba la conexión con SELECT NOW(). Si falla, la app no arranca. */
+  /** Prueba la conexión con SELECT NOW(). Si falla, la aplicación no arranca (fail-fast). */
   async onModuleInit() {
     try {
       await this.pool.query('SELECT NOW()');
@@ -39,13 +45,17 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** Al cerrar el módulo: cierra el pool de conexiones. */
+  /** Cierra todas las conexiones del pool. Nest lo llama al cerrar la aplicación. */
   async onModuleDestroy() {
     await this.pool.end();
     this.logger.log('Database pool closed');
   }
 
-  /** Ejecuta una query SQL con parámetros ($1, $2...). Evita SQL injection y loguea tiempo de ejecución. */
+  /**
+   * Ejecuta una consulta SQL con parámetros posicionales ($1, $2, …).
+   * Los params se escapan automáticamente (evita SQL injection). Loguea duración en nivel debug.
+   * @returns QueryResult con .rows (array de filas) y .rowCount.
+   */
   async query<T extends QueryResultRow = any>(text: string, params?: any[]): Promise<QueryResult<T>> {
     const start = Date.now();
     try {
@@ -59,12 +69,19 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** Devuelve un cliente del pool. Hay que llamar client.release() al terminar para devolverlo al pool. */
+  /**
+   * Obtiene una conexión del pool. Debes llamar client.release() cuando termines para devolverla al pool.
+   * Úsalo cuando necesites varias queries en la misma conexión o transacciones manuales (BEGIN/COMMIT).
+   */
   async getClient(): Promise<PoolClient> {
     return await this.pool.connect();
   }
 
-  /** Ejecuta el callback dentro de una transacción (BEGIN/COMMIT). Si hay error hace ROLLBACK y libera el cliente. */
+  /**
+   * Ejecuta el callback dentro de una transacción (BEGIN … COMMIT).
+   * Si el callback lanza, se hace ROLLBACK y se libera el cliente. Siempre libera en finally.
+   * @param callback Recibe el PoolClient; usa client.query() para tus sentencias.
+   */
   async transaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
     const client = await this.getClient();
     try {

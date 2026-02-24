@@ -1,8 +1,9 @@
+// Tipos que reflejan la tabla categories (y los DTOs de entrada).
 export interface Category {
-    category_id: string // UUID
+    category_id: string; // UUID
     name: string;
     description: string | null;
-    color: string; //Hex color    
+    color: string; // hex #RRGGBB
 }
 
 export interface CreateCategoryInput {

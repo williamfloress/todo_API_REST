@@ -1,6 +1,4 @@
-/**
- * Módulo de tareas: expone TasksController y TasksService; depende de DatabaseModule.
- */
+// Tareas: controller y service; usa DatabaseModule para SQL.
 import { Module } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
